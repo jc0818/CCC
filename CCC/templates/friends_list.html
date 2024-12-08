@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="friends-container">
+        <h1>친구 목록</h1>
+        <ul class="friends-list">
+            {% for friend in friends %}
+            <li class="friend-item">
+                <div class="friend-card">
+                    <div class="friend-info">
+                        <span class="friend-name">{{ friend[1] }}</span> <!-- 친구 이름 -->
+                    </div>
+                    <div class="friend-actions">
+                        <a href="{{ url_for('chat', friend_id=friend[0]) }}" class="chat-button">채팅하기</a> <!-- 채팅하기 버튼 -->
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

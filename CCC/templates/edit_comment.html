@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>댓글 수정</h1>
+<form method="POST">
+    <textarea id="content" name="content" rows="3" required>{{ comment[0] }}</textarea>
+    <br>
+    <button type="submit">수정</button>
+</form>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="add-event-container">
+    <h2>일정 추가</h2>
+    <form method="POST" action="{{ url_for('add_event') }}">
+        <label for="title">제목:</label><br>
+        <input type="text" id="title" name="title" required><br><br>
+
+        <label for="description">설명:</label><br>
+        <textarea id="description" name="description"></textarea><br><br>
+
+        <label for="date">시작 날짜:</label><br>
+        <input type="date" id="date" name="start_date" required><br><br>
+
+        <label for="time">시작 시간:</label><br>
+        <input type="time" id="time" name="start_time" required><br><br>
+
+        <label for="end_date">종료 날짜:</label><br>
+        <input type="date" id="end_date" name="end_date"><br><br>
+
+        <label for="end_time">종료 시간:</label><br>
+        <input type="time" id="end_time" name="end_time"><br><br>
+
+        <button type="submit">일정 추가</button>
+    </form>
+</div>
+{% endblock %}

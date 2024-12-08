@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>게시판</h1>
+
+<!-- 새 게시글 작성 버튼 -->
+<a href="{{ url_for('new_post') }}" class="button add-post">새 게시글 작성</a>
+
+<div class="board-posts">
+    {% for post in posts %}
+    <div class="post-card">
+        <!-- 게시글 제목 -->
+        <h2 class="post-title">
+            <a href="{{ url_for('post_detail', post_id=post[0]) }}">{{ post[1] }}</a>
+        </h2>
+
+        <!-- 작성자와 작성일 -->
+        <div class="post-meta">
+            <span class="post-author"><strong>작성자:</strong> {{ post[2] }}</span>
+            <span class="post-date"><strong>작성일:</strong> {{ post[3] }}</span>
+        </div>
+
+        <!-- 자세히 보기 버튼 -->
+        <a href="{{ url_for('post_detail', post_id=post[0]) }}" class="button post-detail-link">자세히 보기</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

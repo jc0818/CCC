@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>친구 요청</title>
+    
+</head>
+<body>
+    <div class="container">
+        <h1>받은 친구 요청</h1>
+        <ul>
+            {% for request in friend_requests %}
+            <li class="friend-request-item">
+                <span>{{ request.username }}님으로부터 친구 요청</span>
+                <div class="friend-request-actions">
+                    <form method="POST" action="{{ url_for('respond_friend_request') }}">
+                        <input type="hidden" name="request_id" value="{{ request.id }}">
+                        <button type="submit" name="response" value="accept" class="accept-btn">수락</button>
+                        <button type="submit" name="response" value="reject" class="reject-btn">거절</button>
+                    </form>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+</body>
+</html>
+{% endblock %}

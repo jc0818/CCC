@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>친구 요청</title>
+</head>
+<body>
+    <div class="container">
+        <h1>친구 요청 보내기</h1>
+        <form method="POST" action="{{ url_for('send_friend_request') }}">
+            <label for="receiver_username">추가할 친구의 닉네임을 입력하세요:</label>
+            <input type="text" id="receiver_username" name="receiver_username" placeholder="친구 닉네임" required>
+            <button type="submit">친구 요청 보내기</button>
+        </form>
+    </div>
+</body>
+</html>
+{% endblock %}

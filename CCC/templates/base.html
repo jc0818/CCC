@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ title if title else "캘캘캘" }}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    </head>
+    
+    
+<body>
+    <!-- 헤더 -->
+    <header>
+        <nav class="navbar">
+            <h1><a href="{{ url_for('dashboard') }}" class="logo">캘캘캘</a></h1>
+            <ul class="nav-links">
+                {% if session.get('user_id') %}
+                    <li><a href="{{ url_for('calendar') }}">내 캘린더</a></li>
+                    <li><a href="{{ url_for('add_event') }}" class="add-event-link">일정 추가하기</a></li>
+                    <li><a href="{{ url_for('board') }}">게시판</a></li>
+                    <li><a href="{{ url_for('send_friend_request') }}">친구 신청</a></li> <!-- 친구 신청 링크 추가 -->
+                    <li><a href="{{ url_for('view_friend_requests') }}">친구 수락/거절</a></li>
+                    <li><a href="{{ url_for('friends_list') }}">친구 목록</a></li> <!-- 친구 목록 -->
+                    <li><a href="{{ url_for('logout') }}">( {{ username }} ) 로그아웃</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">로그인</a></li>
+                    <li><a href="{{ url_for('register') }}">회원가입</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+    
+    
+
+    <!-- 메인 컨텐츠 -->
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            <ul class="flashes">
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="{{ url_for('static', filename='calendar.js') }}"></script>
+    
+</body>
+</html>

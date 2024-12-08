@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8' />
+  <!-- 화면 해상도에 따라 글자 크기 대응(모바일 대응) -->
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <!-- jquery CDN -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- fullcalendar CDN -->
+  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.css' rel='stylesheet' />
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.js'></script>
+  <!-- fullcalendar 언어 CDN -->
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/locales-all.min.js'></script>
+<style>
+  /* body 스타일 */
+  body {
+    
+    font-size: 14px;
+    font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+  }
+  /* 드래그 박스의 스타일 */
+  #external-events {
+    position: fixed;
+    left: 20px;
+    top: 20px;
+    width: 100px;
+    padding: 0 10px;
+    border: 1px solid #ccc;
+    background: #eee;
+    text-align: left;
+  }
+  #external-events h4 {
+    font-size: 16px;
+    margin-top: 0;
+    padding-top: 1em;
+  }
+  #external-events .fc-event {
+    margin: 3px 0;
+    cursor: move;
+  }
+ 
+  #external-events p {
+    margin: 1.5em 0;
+    font-size: 11px;
+    color: #666;
+  }
+ 
+  #external-events p input {
+    margin: 0;
+    vertical-align: middle;
+  }
+ 
+ 
+  #calendar1 {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* 모달 창 전체 */
+/* 모달 배경 */
+.modal {
+    display: none; /* 기본적으로 숨김 */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+    align-items: center;
+    justify-content: center;
+}
+
+/* 모달 콘텐츠 */
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* 제목 및 레이블 */
+label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* 제목, 설명, 시작/종료 시간 */
+#modal-title, #modal-description {
+    font-size: 16px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#modal-title[contenteditable="true"], #modal-description[contenteditable="true"] {
+    background-color: #f9f9f9;
+}
+
+/* 시작 및 종료 시간 입력 필드 */
+input[type="datetime-local"] {
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* 버튼 스타일 */
+button {
+    padding: 10px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+/* 버튼 색상 변경 */
+button:hover {
+    background-color: #2980b9;
+}
+
+/* 수정 버튼 */
+#save-button {
+    background-color: #2ecc71;
+}
+
+#save-button:hover {
+    background-color: #27ae60;
+}
+
+/* 삭제 버튼 */
+#delete-button {
+    background-color: #e74c3c;
+}
+
+#delete-button:hover {
+    background-color: #c0392b;
+}
+
+/* 닫기 버튼 */
+button[onclick="closeModal()"] {
+    background-color: #bdc3c7;
+}
+
+button[onclick="closeModal()"]:hover {
+    background-color: #95a5a6;
+}
+
+</style>
+</head>
+<div id='wrap'>
+    <div id='calendar-wrap'>
+        <div id='calendar1'></div>
+    </div>
+</div>
+
+<div id="event-modal" class="modal">
+  <div class="modal-content">
+    <!-- 제목 수정 -->
+    <label for="modal-title">일정 제목</label>
+    <h3 id="modal-title" contenteditable="true">일정 제목</h3>
+
+    <!-- 설명 수정 -->
+    <label for="modal-description">설명</label>
+    <span id="modal-description" contenteditable="true">여기에 설명이 표시됩니다.</span>
+
+    <!-- 시작 시간 수정 -->
+    <label for="modal-start">시작 시간</label>
+    <input type="datetime-local" id="modal-start" value="">
+
+    <!-- 종료 시간 수정 -->
+    <label for="modal-end">종료 시간</label>
+    <input type="datetime-local" id="modal-end" value="">
+
+    <button id="save-button">수정</button>
+    <button id="delete-button">삭제</button>
+    <button onclick="closeModal()">닫기</button>
+  </div>
+</div>
+
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var calendarEl = document.getElementById('calendar1');
+
+  var calendar = new FullCalendar.Calendar(calendarEl, {
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,timeGridDay'
+    },
+    locale: 'ko',  // 한국어 설정
+    editable: true,  // 수정 가능
+    droppable: true,  // 드래그 가능
+    events: '/api/events',  // 일정 불러오기 (Flask API 호출)
+
+    // 일정 클릭 시 모달 창에 데이터 삽입
+    eventClick: function(info) {
+      // 모달 창에 일정 정보 삽입
+      document.getElementById('modal-title').textContent = info.event.title;
+      document.getElementById('modal-description').textContent = info.event.extendedProps.description || '설명이 없습니다.';
+      document.getElementById('modal-start').value = info.event.start.toISOString().slice(0, 16);  // 시작 시간
+      document.getElementById('modal-end').value = info.event.end ? info.event.end.toISOString().slice(0, 16) : ''; // 종료 시간
+
+      // 수정, 삭제 버튼 이벤트 설정
+      document.getElementById('save-button').onclick = function() { updateEvent(info.event); };
+      document.getElementById('delete-button').onclick = function() { deleteEvent(info.event.id, info); };
+
+      // 모달 창 열기
+      document.getElementById('event-modal').style.display = 'flex';
+    },
+
+    // 새로운 일정 추가 처리
+    eventReceive: function(info) {
+      const newEvent = {
+        title: info.event.title,
+        start: info.event.start.toISOString(),
+        end: info.event.end ? info.event.end.toISOString() : null,
+        description: info.event.extendedProps.description || ''
+      };
+      fetch('/api/events', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newEvent),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.message) {
+          alert(data.message);
+        }
+      })
+      .catch(error => console.error('Error:', error));
+    }
+  });
+
+  calendar.render();
+});
+
+// 모달 창 닫기
+function closeModal() {
+  document.getElementById('event-modal').style.display = 'none';
+}
+
+// 일정 수정
+function updateEvent(event) {
+  // 수정된 데이터를 읽어옴
+  const updatedEvent = {
+    title: document.getElementById('modal-title').textContent, // 수정된 제목
+    start: new Date(document.getElementById('modal-start').value).toISOString(), // 수정된 시작 시간
+    end: new Date(document.getElementById('modal-end').value).toISOString(), // 수정된 종료 시간
+    description: document.getElementById('modal-description').textContent // 수정된 설명
+  };
+
+  // PUT 요청으로 수정된 데이터 서버로 전송
+  fetch(`/api/events/${event.id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(updatedEvent),
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.message) {
+      alert(data.message);
+      // 캘린더에서 일정 업데이트
+      event.setProp('title', updatedEvent.title);
+      event.setStart(updatedEvent.start);
+      event.setEnd(updatedEvent.end);
+      event.setExtendedProp('description', updatedEvent.description);
+      closeModal();  // 모달 닫기
+    }
+  })
+  .catch(error => console.error('Error:', error));
+}
+
+// 일정 삭제
+function deleteEvent(eventId, info) {
+  if (confirm('정말로 이 일정을 삭제하시겠습니까?')) {
+    fetch(`/api/events/${eventId}`, {
+      method: 'DELETE',
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.message) {
+        alert(data.message);
+        info.event.remove();  // 캘린더에서 일정 제거
+        closeModal();  // 모달 닫기
+      }
+    })
+    .catch(error => console.error('Error:', error));
+  }
+}
+</script>
+
+
+{% endblock %}

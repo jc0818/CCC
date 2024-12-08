@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ post[0] }}</h1>
+<p>{{ post[1] }}</p>
+<p><strong>작성자:</strong> {{ post[2] }}</p>
+<p><strong>작성일:</strong> {{ post[3] }}</p>
+
+<!-- 게시글 수정/삭제 버튼 -->
+{% if session['user_id'] == post_user_id %}
+<div class="post-actions">
+    <a href="{{ url_for('edit_post', post_id=post_id) }}" class="button small">게시글 수정</a>
+    <form action="{{ url_for('delete_post', post_id=post_id) }}" method="POST" style="display:inline;">
+        <button type="submit" class="button small">게시글 삭제</button>
+    </form>
+</div>
+{% endif %}
+
+<hr>
+
+<h2>댓글</h2>
+<ul class="comment-list">
+    {% for comment in comments %}
+    <li>
+        <p>{{ comment[1] }}</p>
+        <span><strong>작성자:</strong> {{ comment[2] }}</span>
+        <span><strong>작성일:</strong> {{ comment[3] }}</span>
+
+        <!-- 댓글 수정/삭제 버튼 -->
+        {% if session['user_id'] == comment_user_ids[loop.index0] %}
+        <div class="comment-actions">
+            <a href="{{ url_for('edit_comment', post_id=post_id, comment_id=comment_ids[loop.index0]) }}" class="button small">댓글 수정</a>
+            <form action="{{ url_for('delete_comment', post_id=post_id, comment_id=comment_ids[loop.index0]) }}" method="POST" style="display:inline;">
+                <button type="submit" class="button small">댓글 삭제</button>
+            </form>
+        </div>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+
+<!-- 댓글 작성 폼 -->
+<form method="POST" class="comment-form">
+    <label for="comment">댓글 작성:</label>
+    <textarea id="comment" name="comment" rows="3" required></textarea>
+    <br>
+    <button type="submit" class="button">댓글 작성</button>
+</form>
+{% endblock %}

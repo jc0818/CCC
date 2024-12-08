@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="dashboard">
+    <h2 class="welcome-message">환영합니다, {{ username }}님!</h2>
+    <p class="subtitle">캘캘캘에서 일정을 관리하고 팀과 소통하세요.</p>
+
+    <div class="dashboard-container">
+        <!-- 다음 일정까지 남은 시간 표시 -->
+        <div class="card">
+            <h3 style="color: blue;">다음 일정까지 남은 시간</h3>
+            <ul class="event-list">
+                {% for event in events %}
+                    <li class="event-item">
+                        <p><strong>{{ event.title }}</strong></p>
+                        <p>설명: {{ event.description }}</p>
+                        <p><strong>시작 시간:</strong> {{ event.start }}</p>
+                        <p><strong>남은 시간:</strong> {{ event.remaining_time }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- 공지사항 섹션 -->
+    <div class="card">
+        <h3 class="card-title">공지사항</h3>
+        <p class="notice-content">캘캘캘 베타 버전을 사용해주셔서 감사합니다! 새로운 기능이 곧 추가됩니다.</p>
+    </div>
+
+    <!-- 향후 추가 기능 섹션 -->
+    <div class="card">
+        <h3 class="card-title">새로운 기능</h3>
+        <p>친구 추가, 1대1 채팅방, 게시판 등 다양한 기능을 체험해보세요!</p>
+    </div>
+</div>
+{% endblock %}

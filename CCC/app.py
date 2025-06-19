@@ -6,7 +6,6 @@ from flask_apscheduler import APScheduler
 import pytz
 
 app = Flask(__name__)
-app.secret_key = "your_secret_key"  # 보안 키
 
 # 데이터베이스 초기화 함수
 def init_db():
